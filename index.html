@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clínica Dental - Sistema de Citas QR</title>
+<style>
+:root{--primary:#0ea5e9;--primary-dark:#0369a1;--text:#0f172a;--muted:#64748b;--bg:#f8fafc;--white:#fff;--wa:#25D366;--danger:#ef4444;--success:#10b981;--warning:#f59e0b;--border:#e2e8f0}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;color:var(--text);background:var(--bg);line-height:1.6}
+.nav{background:var(--white);box-shadow:0 2px 10px rgba(0,0,0,.1);position:sticky;top:0;z-index:100;padding:12px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.nav button{padding:9px 18px;border:2px solid var(--primary);background:white;color:var(--primary);border-radius:25px;cursor:pointer;font-weight:600;font-size:.9rem}
+.nav button.active,.nav button:hover{background:var(--primary);color:white}
+.view{display:none}.view.active{display:block}
+.hero{background:linear-gradient(135deg,#0ea5e9,#06b6d4);color:white;padding:70px 20px;text-align:center}
+.hero h1{font-size:2.5rem;margin-bottom:15px}
+.hero p{font-size:1.1rem;margin-bottom:25px;opacity:.95}
+.btn{display:inline-block;padding:13px 26px;border-radius:30px;text-decoration:none;font-weight:600;border:none;cursor:pointer;font-size:1rem;margin:5px}
+.btn-w{background:white;color:var(--primary-dark)}
+.btn-wa{background:var(--wa);color:white}
+section{padding:60px 20px}
+.st{text-align:center;margin-bottom:40px}
+.st h2{font-size:2.2rem;color:var(--primary-dark);margin-bottom:8px}
+.form-box{max-width:650px;margin:0 auto;background:white;padding:30px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.1)}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.fi{display:flex;flex-direction:column}
+.fi.full{grid-column:1/-1}
+.fi label{font-weight:600;margin-bottom:5px;font-size:.9rem}
+.fi label .r{color:var(--danger)}
+.fi input,.fi select,.fi textarea{padding:11px;border:2px solid #e2e8f0;border-radius:10px;font-size:1rem;font-family:inherit}
+.fi input:focus,.fi select:focus,.fi textarea:focus{outline:none;border-color:var(--primary)}
+.fi textarea{resize:vertical;min-height:80px}
+.btn-go{background:var(--primary);color:white;padding:13px;border-radius:30px;border:none;font-weight:600;cursor:pointer;font-size:1rem;flex:1;min-width:150px;margin:5px}
+.btn-go:hover{background:var(--primary-dark)}
+.btn-go-wa{background:var(--wa)}
+.btn-go-wa:hover{background:#1ebe57}
+.fb{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+footer{background:#0f172a;color:#cbd5e1;padding:30px 20px;text-align:center}
+footer a{color:var(--primary);text-decoration:none}
+.ft{max-width:1200px;margin:0 auto 15px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;text-align:left}
+.ft h4{color:white;margin-bottom:8px}
+.qv{background:linear-gradient(135deg,var(--primary),var(--primary-dark));min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.qb{background:white;border-radius:20px;box-shadow:0 25px 60px rgba(0,0,0,.3);max-width:420px;width:100%;overflow:hidden}
+.qh{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;padding:25px;text-align:center}
+.qh h1{font-size:1.6rem;margin-bottom:5px}
+.qf{padding:25px}
+.qi{background:#f0f9ff;border-left:4px solid var(--primary);padding:12px;border-radius:8px;margin-bottom:20px;font-size:.88rem}
+.qi strong{color:var(--primary-dark)}
+.qok{display:none;text-align:center;padding:30px}
+.qok.show{display:block}
+.qok-i{width:70px;height:70px;background:var(--success);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.5rem;margin:0 auto 15px}
+.qok h2{color:var(--primary-dark);margin-bottom:8px}
+.qok .t{background:#fef3c7;color:#92400e;padding:10px 18px;border-radius:10px;font-weight:600;display:inline-block;margin:10px 0}
+.lw{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.lb{background:white;padding:35px;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.1);max-width:380px;width:100%;text-align:center}
+.lb h1{color:var(--primary-dark);margin-bottom:8px}
+.lb input{width:100%;padding:13px;border:2px solid var(--border);border-radius:10px;font-size:1rem;margin:10px 0}
+.lb input:focus{outline:none;border-color:var(--primary)}
+.lb button{width:100%;padding:13px;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:1rem}
+.le{color:var(--danger);font-size:.85rem;margin-top:8px;display:none}
+.lh{margin-top:15px;font-size:.78rem;color:var(--muted);background:#f8fafc;padding:8px;border-radius:8px}
+.pa{display:none}.pa.active{display:block}
+.tb{background:white;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.05);position:sticky;top:50px;z-index:10;flex-wrap:wrap;gap:8px}
+.tb h2{color:var(--primary-dark);font-size:1.2rem}
+.ta{display:flex;gap:6px;flex-wrap:wrap}
+.bs{padding:7px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-size:.82rem}
+.bs-n{background:var(--success);color:white}
+.bs-c{background:#6366f1;color:white}
+.bs-d{background:var(--warning);color:white}
+.bs-e{background:var(--primary);color:white}
+.bs-o{background:var(--danger);color:white}
+.bs-nf{background:#e2e8f0;color:var(--text);position:relative}
+.bs-nf.on{background:var(--success);color:white}
+.bs-nf .d{position:absolute;top:3px;right:3px;width:7px;height:7px;background:var(--danger);border-radius:50%;display:none}
+.bs-nf.h .d{display:block}
+.ds{max-width:1400px;margin:0 auto;padding:20px}
+.ss{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:20px}
+.sc{background:white;padding:20px;border-radius:14px;box-shadow:0 4px 12px rgba(0,0,0,.04);border-left:4px solid var(--primary);cursor:pointer}
+.sc.s{border-left-color:var(--success)}.sc.w{border-left-color:var(--warning)}.sc.d{border-left-color:var(--danger)}
+.sn{font-size:2.2rem;font-weight:700;color:var(--primary-dark)}
+.sc.s .sn{color:var(--success)}.sc.w .sn{color:var(--warning)}.sc.d .sn{color:var(--danger)}
+.sl{color:var(--muted);font-size:.85rem;margin-top:4px}
+.ts{background:white;padding:8px;border-radius:14px;margin-bottom:15px;display:flex;gap:4px}
+.tab{flex:1;padding:10px;border:none;background:transparent;cursor:pointer;font-weight:600;font-size:.9rem;border-radius:10px;color:var(--muted)}
+.tab.active{background:var(--primary);color:white}
+.fl{background:white;padding:15px;border-radius:14px;margin-bottom:15px;display:flex;gap:10px;flex-wrap:wrap}
+.fl input,.fl select{padding:9px;border:2px solid var(--border);border-radius:8px;font-size:.9rem}
+.fl input{flex:1;min-width:150px}
+.vt{display:none}.vt.active{display:block}
+.tw{background:white;border-radius:14px;overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{padding:12px;text-align:left;font-weight:600;color:var(--muted);font-size:.8rem;text-transform:uppercase;background:#f8fafc}
+td{padding:12px;border-top:1px solid var(--border);font-size:.9rem}
+.bg{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600}
+.bg-p{background:#fef3c7;color:#92400e}.bg-c{background:#d1fae5;color:#065f46}.bg-x{background:#fee2e2;color:#991b1b}
+.ac{display:flex;gap:4px;flex-wrap:wrap}
+.ba{padding:5px 8px;border-radius:6px;border:none;cursor:pointer;font-size:.75rem;font-weight:600}
+.ba-o{background:var(--success);color:white}.ba-x{background:var(--warning);color:white}
+.ba-e{background:var(--primary);color:white}.ba-d{background:var(--danger);color:white}.ba-w{background:var(--wa);color:white}
+.cc{background:white;padding:15px;border-radius:14px;margin-bottom:15px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.ct{font-size:1.3rem;font-weight:700;color:var(--primary-dark)}
+.cn{display:flex;gap:8px}
+.cb{width:36px;height:36px;border-radius:10px;border:none;background:var(--primary);color:white;cursor:pointer;font-size:1rem;font-weight:700}
+.cb-t{width:auto;padding:0 12px;font-size:.82rem;background:#e2e8f0;color:var(--text)}
+.cg{background:white;border-radius:14px;overflow:hidden}
+.ch{display:grid;grid-template-columns:repeat(7,1fr);background:#f8fafc}
+.ch div{padding:10px;text-align:center;font-weight:700;color:var(--muted);font-size:.8rem}
+.cd{display:grid;grid-template-columns:repeat(7,1fr)}
+.cy{min-height:90px;padding:5px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);cursor:pointer}
+.cy:nth-child(7n){border-right:none}
+.cy.om{background:#fafafa;color:#cbd5e1}
+.cy.td{background:#eff6ff}
+.cy.td .dn{background:var(--primary);color:white;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.dn{font-weight:700;font-size:.85rem;margin-bottom:3px}
+.cv{font-size:.65rem;padding:2px 4px;border-radius:3px;color:white;font-weight:600;margin:1px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cv.p{background:var(--warning)}.cv.c{background:var(--success)}.cv.x{background:var(--danger);opacity:.6}
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:3000;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.ov.active{display:flex}
+.ob{background:white;border-radius:20px;max-width:700px;width:100%;margin:20px auto;box-shadow:0 25px 60px rgba(0,0,0,.3)}
+.ob.sm{max-width:450px}
+.oh{padding:20px 25px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.oh h3{color:var(--primary-dark);font-size:1.3rem}
+.oc{background:none;border:none;font-size:1.7rem;cursor:pointer;color:var(--muted)}
+.om{padding:25px}
+.of{padding:15px 25px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.bm{padding:10px 20px;border-radius:10px;border:none;font-weight:600;cursor:pointer;font-size:.9rem}
+.bm-c{background:#e2e8f0}.bm-s{background:var(--primary);color:white}.bm-w{background:var(--warning);color:white}
+.cs{margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid var(--border)}
+.cs:last-child{border-bottom:none}
+.cs h4{color:var(--primary-dark);margin-bottom:10px;font-size:1rem}
+.cg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ch2{background:#eff6ff;border-left:4px solid var(--primary);padding:10px;border-radius:8px;font-size:.83rem;margin-bottom:15px}
+.cc2{background:#f0fdf4;border:2px solid var(--success);padding:12px;border-radius:10px;margin-bottom:15px}
+.cc2 h4{color:var(--success);margin-bottom:8px}
+.cr{display:flex;justify-content:space-between;padding:4px 0;font-size:.88rem}
+.qw{max-width:1300px;margin:0 auto;padding:20px}
+.qw h2{color:var(--primary-dark);font-size:1.8rem;margin-bottom:8px}
+.qc{background:white;padding:20px;border-radius:14px;margin-bottom:20px}
+.qc h3{color:var(--primary-dark);margin-bottom:12px}
+.qg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.qg label{display:flex;flex-direction:column;gap:4px;font-weight:600;font-size:.88rem}
+.qg input,.qg select{padding:9px;border:2px solid #e2e8f0;border-radius:8px;font-size:.95rem}
+.qa{display:flex;gap:8px;margin-top:15px;flex-wrap:wrap;align-items:center}
+.qu{background:#f0f9ff;padding:9px 14px;border-radius:8px;font-family:monospace;font-size:.82rem;color:var(--primary-dark);flex:1;min-width:150px;word-break:break-all}
+.qb2{background:var(--primary);color:white;padding:10px 20px;border:none;border-radius:10px;font-weight:600;cursor:pointer}
+.qi2{background:#eff6ff;border-left:4px solid var(--primary);padding:15px;border-radius:10px;margin-bottom:20px}
+.qi2 h4{color:var(--primary-dark);margin-bottom:8px}
+.qi2 ul{margin-left:18px}.qi2 li{margin-bottom:4px}
+.qi2 code{background:white;padding:1px 5px;border-radius:4px}
+.qt{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.qtc{background:white;border-radius:14px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+.qth{padding:12px 15px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
+.qth h4{color:var(--primary-dark);font-size:1rem}
+.qta{display:flex;gap:5px}
+.qtb{padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-size:.82rem;font-weight:600}
+.qtb-p{background:var(--primary);color:white}.qtb-d{background:var(--success);color:white}
+.pa4{width:210mm;min-height:297mm;padding:15mm;background:white;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;margin:0 auto}
+.pa4 .lg{font-size:2.5rem;font-weight:800;color:var(--primary-dark);margin-bottom:4px}
+.pa4 .lg span{color:var(--primary)}
+.pa4 .tg{color:var(--muted);font-size:1.1rem;margin-bottom:25px}
+.pa4 .qf2{background:linear-gradient(135deg,var(--primary),var(--primary-dark));padding:18px;border-radius:22px;margin-bottom:25px}
+.pa4 .qw2{background:white;padding:14px;border-radius:14px}
+.pa4 .qw2 img{width:250px;height:250px;display:block}
+.pa4 .tb2{font-size:2.2rem;font-weight:800;color:var(--primary-dark);margin-bottom:12px}
+.pa4 .ss2{display:flex;gap:15px;margin:20px 0;flex-wrap:wrap;justify-content:center}
+.pa4 .st2{flex:1;min-width:120px;max-width:170px}
+.pa4 .sn2{width:44px;height:44px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700;margin:0 auto 8px}
+.pa4 .st2 h5{color:var(--primary-dark);margin-bottom:3px}
+.pa4 .st2 p{color:var(--muted);font-size:.88rem}
+.pa4 .pr2{background:#fef3c7;color:#92400e;padding:12px 25px;border-radius:25px;font-weight:700;font-size:1.05rem;margin:15px 0}
+.pa4 .ct2{color:var(--muted);font-size:.95rem}
+.pa4 .ct2 strong{color:var(--primary-dark)}
+.ptk{width:90mm;height:50mm;padding:5mm;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;display:flex;align-items:center;gap:6mm;margin:0 auto}
+.ptk .tq{background:white;padding:3mm;border-radius:3mm}
+.ptk .tq img{width:32mm;height:32mm}
+.ptk .ti{flex:1}
+.ptk .tt{font-size:12pt;font-weight:800;line-height:1.1}
+.ptk .ts{font-size:8pt;opacity:.9;margin:2mm 0}
+.ptk .tp{background:rgba(255,255,255,.2);padding:2mm 4mm;border-radius:3mm;font-size:8pt;font-weight:700;display:inline-block}
+.pct{width:210mm;min-height:297mm;padding:10mm;background:white;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center;margin:0 auto}
+.pct .cl{font-size:1.8rem;font-weight:800;color:var(--primary-dark)}
+.pct .cl span{color:var(--primary)}
+.pct .ch2{font-size:3rem;font-weight:900;color:var(--primary-dark);line-height:1;margin:10mm 0}
+.pct .cs2{font-size:1.2rem;color:var(--muted);margin-bottom:10mm}
+.pct .cq{background:linear-gradient(135deg,#fef3c7,#fde68a);padding:12mm;border-radius:25px;margin:8mm 0}
+.pct .ci{background:white;padding:8mm;border-radius:18px}
+.pct .ci img{width:170mm;height:170mm}
+.pct .csc{font-size:1.7rem;font-weight:800;color:#92400e;margin-top:8mm}
+.pct .cst{display:grid;grid-template-columns:repeat(3,1fr);gap:8mm;margin:10mm 0;width:100%}
+.pct .csp{background:#f0f9ff;padding:6mm;border-radius:12px}
+.pct .cspn{font-size:2rem;font-weight:900;color:var(--primary);margin-bottom:2mm}
+.pct .csp h5{color:var(--primary-dark);font-size:1rem}
+.pct .csp p{color:var(--muted);font-size:.88rem}
+.pct .cpr{background:var(--success);color:white;padding:8mm 18mm;border-radius:35px;font-size:1.5rem;font-weight:800;margin:8mm 0}
+.pct .cft{color:var(--muted);font-size:.9rem}
+.pct .cft strong{color:var(--primary-dark)}
+.psm{width:210mm;height:100mm;background:white;border:3px dashed var(--primary);border-radius:14px;display:flex;align-items:center;padding:8mm;gap:8mm;margin:0 auto}
+.psm .sq{background:var(--primary);padding:6mm;border-radius:12px}
+.psm .si{background:white;padding:4mm;border-radius:8px}
+.psm .si img{width:60mm;height:60mm}
+.psm .sin{flex:1}
+.psm .slg{font-size:1.2rem;font-weight:800;color:var(--primary-dark);margin-bottom:3mm}
+.psm .slg span{color:var(--primary)}
+.psm .stt{font-size:1.4rem;font-weight:800;color:var(--primary-dark);line-height:1.1;margin-bottom:3mm}
+.psm .ss3{display:flex;gap:3mm;margin-bottom:3mm}
+.psm .sst{flex:1;background:#f0f9ff;padding:2mm;border-radius:6px;font-size:.78rem}
+.psm .sst strong{color:var(--primary-dark);display:block}
+.psm .spr{background:#fef3c7;color:#92400e;padding:2mm 6mm;border-radius:16px;font-weight:700;font-size:.82rem;display:inline-block}
+.toast{position:fixed;top:15px;right:15px;background:var(--success);color:white;padding:12px 20px;border-radius:10px;box-shadow:0 10px 25px rgba(0,0,0,.2);z-index:5000;transform:translateX(400px);transition:transform .3s;font-size:.9rem}
+.toast.show{transform:translateX(0)}
+.toast.err{background:var(--danger)}.toast.inf{background:var(--primary)}
+.ncn{position:fixed;bottom:20px;right:20px;background:white;padding:16px;border-radius:14px;box-shadow:0 15px 35px rgba(0,0,0,.2);z-index:4000;max-width:280px;border-left:5px solid var(--success);transform:translateX(400px);transition:transform .4s}
+.ncn.show{transform:translateX(0)}
+.ncn h4{margin-bottom:4px;font-size:.9rem}
+.ncn p{font-size:.82rem;margin-bottom:8px}
+.ncn button{background:var(--primary);color:white;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:600;font-size:.8rem}
+@media(max-width:768px){.fg,.cg2,.qg{grid-template-columns:1fr}.hero h1{font-size:1.8rem}.st h2{font-size:1.6rem}.form-box{padding:20px}.tw{overflow-x:auto}table{min-width:700px}.om{padding:15px}.cy{min-height:60px;padding:3px}.dn{font-size:.75rem}.cv{font-size:.55rem}.ct{font-size:1.1rem}.tb{padding:10px}.ds{padding:12px 8px}.nav{padding:8px}.nav button{padding:7px 12px;font-size:.8rem}.pa4,.pct{width:100%;min-height:auto;padding:15px}.pa4 .qw2 img{width:180px;height:180px}.pct .ci img{width:70vw;height:70vw;max-width:170mm}.pct .ch2{font-size:1.8rem}}
+@media print{body{background:white}.nav,.qth,.qw>h2,.qw>p,.qc,.qi2{display:none!important}.qtc{box-shadow:none}@page{margin:0}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <button class="active" onclick="go('landing',this)">🏠 Inicio</button>
+  <button onclick="go('qr',this)"> Pedir Cita</button>
+  <button onclick="go('admin',this)">🔐 Admin</button>
+  <button onclick="go('qrgen',this)">🎨 QR</button>
+</nav>
+
+<div class="view active" id="vL">
+  <section class="hero">
+    <h1>Tu sonrisa merece la mejor atención</h1>
+    <p>Tecnología de vanguardia y trato cercano. Primera visita GRATIS.</p>
+    <a href="#res" class="btn btn-w"> Reservar cita</a>
+    <a href="#" class="btn btn-wa" id="hWA" target="_blank">💬 WhatsApp</a>
+  </section>
+  <section id="res">
+    <div class="st"><h2>Reserva tu cita</h2><p>Te confirmaremos en menos de 2 horas</p></div>
+    <div class="form-box">
+      <form id="bF" class="fg">
+        <div class="fi"><label>Nombre <span class="r">*</span></label><input type="text" name="nombre" required></div>
+        <div class="fi"><label>Teléfono <span class="r">*</span></label><input type="tel" name="telefono" required pattern="[0-9\s\+\-]{9,15}"></div>
+        <div class="fi full"><label>Email</label><input type="email" name="email"></div>
+        <div class="fi"><label>Servicio <span class="r">*</span></label><select name="servicio" required><option value="">Selecciona...</option><option>Primera visita gratuita</option><option>Limpieza dental</option><option>Implantes dentales</option><option>Ortodoncia invisible</option><option>Blanqueamiento</option><option>Estética dental</option><option>Odontopediatría</option><option>Endodoncia</option><option>Urgencia</option></select></div>
+        <div class="fi"><label>Fecha <span class="r">*</span></label><input type="date" name="fecha" required id="fI"></div>
+        <div class="fi"><label>Hora <span class="r">*</span></label><select name="hora" required><option value="">Hora...</option><option>09:00</option><option>09:30</option><option>10:00</option><option>10:30</option><option>11:00</option><option>11:30</option><option>12:00</option><option>12:30</option><option>16:00</option><option>16:30</option><option>17:00</option><option>17:30</option><option>18:00</option><option>18:30</option><option>19:00</option><option>19:30</option></select></div>
+        <div class="fi"><label>¿Primera visita?</label><select name="primeraVisita"><option value="Sí">Sí</option><option value="No">No</option></select></div>
+        <div class="fi full"><label>Comentarios</label><textarea name="comentarios"></textarea></div>
+        <div class="fb">
+          <button type="submit" class="btn-go" id="bG">📅 Guardar</button>
+          <button type="button" class="btn-go btn-go-wa" id="bW">💬 WhatsApp</button>
+        </div>
+      </form>
+    </div>
+  </section>
+  <footer>
+    <div class="ft">
+      <div><h4 class="dN">Clínica Dental</h4><p>Tu clínica de confianza</p></div>
+      <div><h4>Contacto</h4><p class="dD">📍 Dirección</p><p>📞 <a href="#" class="dT">Teléfono</a></p></div>
+      <div><h4>Horario</h4><p class="dH1">Lun-Vie</p><p class="dH2">Sábados</p></div>
+    </div>
+    <div>© 2026 <span class="dN">Clínica Dental</span></div>
+  </footer>
+</div>
+
+<div class="view" id="vQ">
+  <div class="qv">
+    <div class="qb">
+      <div class="qh"><h1 class="dN">🦷 Clínica</h1><p>Solicita tu cita en 30 segundos</p></div>
+      <form class="qf" id="qF">
+        <div class="qi"><strong>📱 ¿Cómo funciona?</strong><br>1. Rellena el formulario<br>2. Envía por WhatsApp<br>3. <strong>Te llamamos en menos de 15 min</strong></div>
+        <div class="fi"><label>Nombre <span class="r">*</span></label><input type="text" name="nombre" required></div>
+        <div class="fi" style="margin-top:12px"><label>Teléfono <span class="r">*</span></label><input type="tel" name="telefono" required pattern="[0-9\s\+\-]{9,15}"></div>
+        <div class="fi" style="margin-top:12px"><label>Servicio <span class="r">*</span></label><select name="servicio" required><option value="">Selecciona...</option><option>Primera visita gratuita</option><option>Limpieza dental</option><option>Implantes dentales</option><option>Ortodoncia invisible</option><option>Blanqueamiento</option><option>Dolor/urgencia</option><option>Otro</option></select></div>
+        <div class="fi" style="margin-top:12px"><label>Preferencia</label><select name="preferencia"><option value="">Sin preferencia</option><option>Lo antes posible</option><option>Esta semana</option><option>Próxima semana</option><option>Mañanas</option><option>Tardes</option></select></div>
+        <div class="fi" style="margin-top:12px"><label>Comentarios</label><textarea name="comentarios"></textarea></div>
+        <button type="button" class="btn btn-wa" style="width:100%;margin-top:15px" onclick="sWA()">💬 Enviar por WhatsApp</button>
+        <button type="button" class="btn-go" style="width:100%;margin-top:8px" onclick="sSave()">✅ Guardar y solicitar llamada</button>
+      </form>
+      <div class="qok" id="qO">
+        <div class="qok-i">✓</div>
+        <h2>¡Solicitud recibida!</h2>
+        <p>Te llamaremos en breve.</p>
+        <div class="t">⏱️ Menos de 15 minutos</div>
+        <p style="margin-top:12px;color:var(--muted);font-size:.85rem">Guárdanos: <strong class="dTV" style="color:var(--primary-dark)">📞 Teléfono</strong></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="view" id="vA">
+  <div class="lw" id="lS">
+    <div class="lb">
+      <h1> Panel Admin</h1>
+      <input type="password" id="pI" placeholder="Contraseña" onkeypress="if(event.key==='Enter')doL()">
+      <button onclick="doL()">Entrar</button>
+      <p class="le" id="lE">❌ Contraseña incorrecta</p>
+      <div class="lh"> Por defecto: <code>admin123</code></div>
+    </div>
+  </div>
+  <div class="pa" id="pA">
+    <div class="tb">
+      <h2>🦷 Panel de Citas</h2>
+      <div class="ta">
+        <button class="bs bs-n" onclick="oN()">➕ Nueva</button>
+        <button class="bs bs-c" onclick="oC()">⚙️ Config</button>
+        <button class="bs bs-nf" id="bN" onclick="tN()">🔔<span class="d"></span></button>
+        <button class="bs bs-d" onclick="lD()">🎭 Demo</button>
+        <button class="bs bs-d" onclick="dA()" style="background:var(--danger)">🗑</button>
+        <button class="bs bs-e" onclick="eC()">📥 CSV</button>
+        <button class="bs bs-o" onclick="doO()">🚪</button>
+      </div>
+    </div>
+    <div class="ds">
+      <div class="ss">
+        <div class="sc" onclick="sF('')"><div class="sn" id="sT">0</div><div class="sl">Total</div></div>
+        <div class="sc w" onclick="sF('pendiente')"><div class="sn" id="sP">0</div><div class="sl">Pendientes</div></div>
+        <div class="sc s" onclick="sF('confirmada')"><div class="sn" id="sC">0</div><div class="sl">Confirmadas</div></div>
+        <div class="sc d" onclick="sF('cancelada')"><div class="sn" id="sX">0</div><div class="sl">Canceladas</div></div>
+      </div>
+      <div class="ts">
+        <button class="tab active" onclick="gT('t',this)"> Tabla</button>
+        <button class="tab" onclick="gT('c',this)"> Calendario</button>
+      </div>
+      <div class="vt active" id="vT">
+        <div class="fl">
+          <input type="text" id="fS" placeholder="🔍 Buscar..." oninput="rT()">
+          <select id="fE" onchange="rT()"><option value="">Todos</option><option value="pendiente">Pendientes</option><option value="confirmada">Confirmadas</option><option value="cancelada">Canceladas</option></select>
+          <select id="fV" onchange="rT()"><option value="">Servicios</option></select>
+        </div>
+        <div class="tw"><table><thead><tr><th>Fecha/Hora</th><th>Paciente</th><th>Teléfono</th><th>Servicio</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tB"></tbody></table></div>
+      </div>
+      <div class="vt" id="vC">
+        <div class="cc"><div class="ct" id="cT"></div><div class="cn"><button class="cb cb-t" onclick="gTdy()">Hoy</button><button class="cb" onclick="cM(-1)">‹</button><button class="cb" onclick="cM(1)">›</button></div></div>
+        <div class="cg"><div class="ch"><div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div></div><div class="cd" id="cB"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="view" id="vG">
+  <div class="qw">
+    <h2>🎨 Generador de QR</h2>
+    <p>Genera QR profesionales listos para imprimir</p>
+    <div class="qc">
+      <h3>⚙️ URL del QR</h3>
+      <div class="qg">
+        <label>URL base<input type="text" id="gU" placeholder="Se detecta automáticamente"></label>
+        <label>Versión (para forzar actualización)<input type="text" id="gV" value="1" placeholder="1"></label>
+      </div>
+      <div class="qa"><div class="qu" id="gP">...</div><button class="qb2" onclick="gQ()">🔄 Regenerar</button></div>
+    </div>
+    <div class="qi2">
+      <h4>💡 Instrucciones</h4>
+      <ul>
+        <li>La URL se detecta <strong>automáticamente</strong> de GitHub Pages</li>
+        <li>Si cambias algo y el QR no se actualiza, <strong>sube la versión</strong> (1→2→3...)</li>
+        <li>Los datos de la clínica se cogen de <strong>⚙️ Config</strong></li>
+      </ul>
+    </div>
+    <div class="qt">
+      <div class="qtc"><div class="qth"><h4> Cartel A4</h4><div class="qta"><button class="qtb qtb-p" onclick="pT('a4')">🖨</button><button class="qtb qtb-d" onclick="dP('a4')"></button></div></div>
+        <div class="pa4" id="a4"><div class="lg"><span class="n1">Clínica</span> <span class="n2">Dental</span></div><div class="tg">Tu clínica de confianza</div><div class="qf2"><div class="qw2"><img class="qI" src="" alt="QR"></div></div><div class="tb2">Pide tu cita<br>en 30 segundos</div><div class="ss2"><div class="st2"><div class="sn2">1</div><h5>Escanea</h5><p>Abre la cámara</p></div><div class="st2"><div class="sn2">2</div><h5>Rellena</h5><p>Nombre y teléfono</p></div><div class="st2"><div class="sn2">3</div><h5>Envía</h5><p>Te llamamos</p></div></div><div class="pr2">⏱️ Te llamamos en 15 min</div><div class="ct2">📞 <strong class="dTV">Tel</strong> · 📍 <span class="dDT">Dir</span></div></div>
+      </div>
+      <div class="qtc"><div class="qth"><h4>💳 Tarjeta 9x5</h4><div class="qta"><button class="qtb qtb-p" onclick="pT('tk')"></button><button class="qtb qtb-d" onclick="dP('tk')">📥</button></div></div>
+        <div class="ptk" id="tk"><div class="tq"><img class="qI" src="" alt="QR"></div><div class="ti"><div class="tt">Pide tu cita<br>ahora</div><div class="ts">Escanea con tu móvil</div><div class="tp">⏱️ 15 min</div></div></div>
+      </div>
+      <div class="qtc"><div class="qth"><h4>📢 Cartel escaparate</h4><div class="qta"><button class="qtb qtb-p" onclick="pT('ct')">🖨</button><button class="qtb qtb-d" onclick="dP('ct')">📥</button></div></div>
+        <div class="pct" id="ct"><div><div class="cl"><span class="n1">Clínica</span> <span class="n2">Dental</span></div></div><div><div class="ch2">Pide tu<br>cita aquí</div><div class="cs2">Sin esperas</div></div><div class="cq"><div class="ci"><img class="qI" src="" alt="QR"></div><div class="csc">📱 Escanea</div></div><div class="cst"><div class="csp"><div class="cspn">1</div><h5>Escanea</h5><p>Cámara</p></div><div class="csp"><div class="cspn">2</div><h5>Rellena</h5><p>30 seg</p></div><div class="csp"><div class="cspn">3</div><h5>Llamamos</h5><p>Confirmamos</p></div></div><div class="cpr">⏱️ 15 min</div><div class="cft">📞 <strong class="dTV">Tel</strong> · 📍 <span class="dDT">Dir</span></div></div>
+      </div>
+      <div class="qtc"><div class="qth"><h4>🏥 Sobremesa</h4><div class="qta"><button class="qtb qtb-p" onclick="pT('sm')">🖨</button><button class="qtb qtb-d" onclick="dP('sm')">📥</button></div></div>
+        <div class="psm" id="sm"><div class="sq"><div class="si"><img class="qI" src="" alt="QR"></div></div><div class="sin"><div class="slg"><span class="n1">Clínica</span> <span class="n2">Dental</span></div><div class="stt">¿Volverás pronto?<br>Pide tu cita</div><div class="ss3"><div class="sst"><strong>📱 Escanea</strong>móvil</div><div class="sst"><strong>✍️ Rellena</strong>30 seg</div><div class="sst"><strong> Llamamos</strong>15 min</div></div><div class="spr">⏱️ Rápido</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ov" id="oC2"><div class="ob"><div class="oh"><h3>️ Configuración</h3><button class="oc" onclick="cO('oC2')">×</button></div><div class="om">
+  <div class="ch2"><strong>ℹ️</strong> Estos datos se aplican en <strong>toda la app</strong>. Se guardan en tu navegador.</div>
+  <div class="cc2"><h4>✅ Actual</h4><div id="cCur"></div></div>
+  <form id="cF">
+    <div class="cs"><h4>🏥 Clínica</h4><div class="cg2"><div class="fi"><label>Nombre <span class="r">*</span></label><input type="text" id="cN" required></div><div class="fi"><label>Eslogan</label><input type="text" id="cE"></div></div></div>
+    <div class="cs"><h4> Contacto</h4><div class="cg2"><div class="fi"><label>WhatsApp (código+número) <span class="r">*</span></label><input type="tel" id="cT2" required placeholder="34643371837"><small style="color:var(--muted)">Sin espacios. Ej: 34643371837</small></div><div class="fi"><label>Teléfono visible</label><input type="text" id="cTV" placeholder="+34 643 371 837"></div><div class="fi full"><label>Email</label><input type="email" id="cEm"></div><div class="fi full"><label>Dirección</label><input type="text" id="cDi"></div></div></div>
+    <div class="cs"><h4>🕐 Horario</h4><div class="cg2"><div class="fi"><label>Principal</label><input type="text" id="cH1"></div><div class="fi"><label>Secundario</label><input type="text" id="cH2"></div></div></div>
+    <div class="cs"><h4>🔐 Admin</h4><div class="fi"><label>Contraseña</label><input type="text" id="cP"></div></div>
+    <div class="cs"><h4>💬 Mensaje WhatsApp</h4><div class="fi full"><label>Plantilla (usa {nombre}, {clinica}, {fecha}, {hora}, {servicio})</label><textarea id="cM" style="min-height:80px"></textarea></div></div>
+  </form>
+</div><div class="of"><button class="bm bm-c" onclick="cO('oC2')">Cancelar</button><button class="bm bm-w" onclick="rC()">🔄 Reset</button><button class="bm bm-s" onclick="sC()">💾 Guardar</button></div></div></div>
+
+<div class="ov" id="oCi"><div class="ob"><div class="oh"><h3 id="oCiT"> Nueva cita</h3><button class="oc" onclick="cO('oCi')">×</button></div><form id="ciF" class="om"><input type="hidden" id="eId"><div class="fg"><div class="fi"><label>Nombre <span class="r">*</span></label><input type="text" name="nombre" required></div><div class="fi"><label>Teléfono <span class="r">*</span></label><input type="tel" name="telefono" required></div><div class="fi full"><label>Email</label><input type="email" name="email"></div><div class="fi"><label>Servicio <span class="r">*</span></label><select name="servicio" required><option value="">Selecciona</option><option>Primera visita gratuita</option><option>Limpieza dental</option><option>Implantes dentales</option><option>Ortodoncia invisible</option><option>Blanqueamiento</option><option>Estética dental</option><option>Odontopediatría</option><option>Endodoncia</option><option>Urgencia</option></select></div><div class="fi"><label>Estado</label><select name="estado"><option value="pendiente">Pendiente</option><option value="confirmada">Confirmada</option><option value="cancelada">Cancelada</option></select></div><div class="fi"><label>Fecha <span class="r">*</span></label><input type="date" name="fecha" required id="fM"></div><div class="fi"><label>Hora <span class="r">*</span></label><select name="hora" required><option value="">Hora</option><option>09:00</option><option>09:30</option><option>10:00</option><option>10:30</option><option>11:00</option><option>11:30</option><option>12:00</option><option>12:30</option><option>16:00</option><option>16:30</option><option>17:00</option><option>17:30</option><option>18:00</option><option>18:30</option><option>19:00</option><option>19:30</option></select></div><div class="fi"><label>¿Primera?</label><select name="primeraVisita"><option value="Sí">Sí</option><option value="No">No</option></select></div><div class="fi full"><label>Comentarios</label><textarea name="comentarios"></textarea></div></div></form><div class="of"><button class="bm bm-c" onclick="cO('oCi')">Cancelar</button><button class="bm bm-s" onclick="sCi()">💾 Guardar</button></div></div></div>
+
+<div class="ov" id="oH"><div class="ob"><div class="oh"><h3>📋 Historial</h3><button class="oc" onclick="cO('oH')">×</button></div><div class="om" id="hB"></div></div></div>
+<div class="ov" id="oD"><div class="ob sm"><div class="oh"><h3>📅 Citas del día</h3><button class="oc" onclick="cO('oD')">×</button></div><div class="om" id="dB"></div></div></div>
+
+<div class="ncn" id="ncn"><h4 id="ncnT">🔔 Nueva cita</h4><p id="ncnP"></p><button onclick="this.parentElement.classList.remove('show')">Cerrar</button></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const DEF={nombre:'Clínica Dental',eslogan:'Tu clínica de confianza',telefono:'34643371837',telVis:'+34 643 371 837',email:'info@clinica.com',dir:'Dirección',h1:'Lun-Vie: 9:00-20:00',h2:'Sáb: 10:00-14:00',pass:'admin123',msg:'Hola {nombre} 👋\n\nTe contactamos de {clinica} 🦷\n\n📅 {fecha} a las {hora}\n🦷 {servicio}\n\n¿Te viene bien?'};
+function C(){try{return{...DEF,...JSON.parse(localStorage.getItem('cfg')||'{}')}}catch(e){return{...DEF}}}
+function SC(c){localStorage.setItem('cfg',JSON.stringify(c))}
+function AC(){const c=C();document.querySelectorAll('.dN').forEach(e=>e.textContent=c.nombre);document.querySelectorAll('.dTV').forEach(e=>e.textContent=' '+c.telVis);document.querySelectorAll('.dT').forEach(e=>{e.textContent=c.telVis;e.href='tel:+'+c.telefono});document.querySelectorAll('.dD,.dDT').forEach(e=>e.textContent=(e.classList.contains('dD')?'📍 ':'')+c.dir);document.querySelectorAll('.dH1').forEach(e=>e.textContent=c.h1);document.querySelectorAll('.dH2').forEach(e=>e.textContent=c.h2);const w=document.getElementById('hWA');if(w)w.href='https://wa.me/'+c.telefono+'?text=Hola,%20quiero%20informaci%C3%B3n';const p=c.nombre.split(' ');document.querySelectorAll('.n1').forEach(e=>e.textContent=p[0]||c.nombre);document.querySelectorAll('.n2').forEach(e=>e.textContent=p.slice(1).join(' '))}
+
+function go(v,b){document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById({landing:'vL',qr:'vQ',admin:'vA',qrgen:'vG'}[v]).classList.add('active');window.scrollTo(0,0);if(v==='qrgen')setTimeout(gQ,100)}
+
+document.getElementById('fI').min=new Date().toISOString().split('T')[0];
+document.getElementById('bF').addEventListener('submit',e=>{e.preventDefault();const b=document.getElementById('bG');b.disabled=true;b.textContent='⏳...';const d=Object.fromEntries(new FormData(e.target));const r=JSON.parse(localStorage.getItem('cit')||'[]');d.id=Date.now();d.estado='pendiente';d.creada=new Date().toISOString();r.push(d);localStorage.setItem('cit',JSON.stringify(r));setTimeout(()=>{alert('✅ Reserva guardada');e.target.reset();b.disabled=false;b.textContent='📅 Guardar'},400)});
+document.getElementById('bW').addEventListener('click',()=>{const c=C(),d=Object.fromEntries(new FormData(document.getElementById('bF')));if(!d.nombre||!d.telefono||!d.servicio||!d.fecha||!d.hora){alert('Rellena los campos obligatorios');return}const m=`¡Hola! Quiero reservar en ${c.nombre}:\n\n👤 ${d.nombre}\n📞 ${d.telefono}\n🦷 ${d.servicio}\n📅 ${d.fecha} ${d.hora}`;window.open('https://wa.me/'+c.telefono+'?text='+encodeURIComponent(m),'_blank')});
+
+function vQ(){const d=Object.fromEntries(new FormData(document.getElementById('qF')));if(!d.nombre||!d.telefono||!d.servicio){alert('Rellena los campos obligatorios');return false}return d}
+function sWA(){const d=vQ();if(!d)return;const c=C();const m=`¡Hola! 👋 Soy *${d.nombre}*, quiero cita en ${c.nombre}.\n\n🦷 ${d.servicio}\n📞 ${d.telefono}\n${d.preferencia?'⏰ '+d.preferencia+'\n':''}${d.comentarios?'💬 '+d.comentarios+'\n':''}\n*Llamadme para confirmar.*`;sQR(d,'wa');window.open('https://wa.me/'+c.telefono+'?text='+encodeURIComponent(m),'_blank');sOk()}
+function sSave(){const d=vQ();if(!d)return;const c=C();sQR(d,'qr');const m=`¡Hola! Soy *${d.nombre}*, quiero cita en ${c.nombre}.\n🦷 ${d.servicio}\n ${d.telefono}\n*Llamadme para confirmar.*`;window.open('https://wa.me/'+c.telefono+'?text='+encodeURIComponent(m),'_blank');sOk()}
+function sQR(d,o){const r=JSON.parse(localStorage.getItem('cit')||'[]');const n={id:Date.now(),nombre:d.nombre,telefono:d.telefono,email:'',servicio:d.servicio,fecha:'',hora:'',preferencia:d.preferencia||'',comentarios:d.comentarios||'',primeraVisita:'Sí',estado:'pendiente',origen:o,creada:new Date().toISOString()};r.push(n);localStorage.setItem('cit',JSON.stringify(r));localStorage.setItem('nqr',JSON.stringify({id:n.id,nombre:d.nombre,telefono:d.telefono,t:Date.now()}))}
+function sOk(){document.getElementById('qF').style.display='none';document.getElementById('qO').classList.add('show')}
+
+function gQ(){let u=document.getElementById('gU').value.trim();if(!u){u=location.origin+location.pathname}const v=document.getElementById('gV').value||'1';const url=u+(u.includes('?')?'&':'?')+'v='+v+'#qr';document.getElementById('gP').textContent=url;document.querySelectorAll('.qI').forEach(i=>i.src='https://api.qrserver.com/v1/create-qr-code/?size=500x500&data='+encodeURIComponent(url)+'&color=0369a1&bgcolor=ffffff&margin=1');AC();toast('✅ QR regenerado (v'+v+')')}
+function pT(id){const el=document.getElementById(id),w=window.open('','_blank'),s=Array.from(document.querySelectorAll('style')).map(x=>x.outerHTML).join('');w.document.write('<!DOCTYPE html><html><head>'+s+'<style>body{margin:0;background:white}@page{margin:0}.nav,.qth,.qw>h2,.qw>p,.qc,.qi2{display:none!important}</style></head><body><div style="display:flex;align-items:center;justify-content:center;min-height:100vh">'+el.outerHTML+'</div></body></html>');w.document.close();setTimeout(()=>{w.focus();w.print()},500)}
+function dP(id){const el=document.getElementById(id);if(typeof html2canvas==='undefined'){toast('⏳ Cargando...','inf');const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=()=>dP(id);document.head.appendChild(s);return}toast('⏳ Generando...','inf');html2canvas(el,{scale:2,backgroundColor:'#fff',useCORS:true}).then(c=>{const a=document.createElement('a');a.download='qr-'+id+'.png';a.href=c.toDataURL();a.click();toast('📥 Descargado')}).catch(()=>toast('❌ Error','err'))}
+
+function doL(){if(document.getElementById('pI').value===C().pass){sessionStorage.setItem('auth','1');showP()}else document.getElementById('lE').style.display='block'}
+function doO(){sessionStorage.removeItem('auth');location.reload()}
+function showP(){document.getElementById('lS').style.display='none';document.getElementById('pA').classList.add('active');lId=mId();rT();rC2();sP2();sQ2()}
+if(sessionStorage.getItem('auth')==='1')showP();
+
+function R(){return JSON.parse(localStorage.getItem('cit')||'[]')}
+function SR(a){localStorage.setItem('cit',JSON.stringify(a))}
+function mId(){const r=R();return r.length?Math.max(...r.map(x=>x.id)):0}
+function uS(){const r=R();document.getElementById('sT').textContent=r.length;document.getElementById('sP').textContent=r.filter(x=>x.estado==='pendiente').length;document.getElementById('sC').textContent=r.filter(x=>x.estado==='confirmada').length;document.getElementById('sX').textContent=r.filter(x=>x.estado==='cancelada').length}
+function lSF(){const r=R(),s=[...new Set(r.map(x=>x.servicio).filter(Boolean))],el=document.getElementById('fV');el.innerHTML='<option value="">Servicios</option>'+s.map(x=>'<option>'+x+'</option>').join('')}
+function sF(e){document.getElementById('fE').value=e;gT('t',document.querySelector('.tab'));rT()}
+
+function rT(){const q=document.getElementById('fS').value.toLowerCase(),e=document.getElementById('fE').value,s=document.getElementById('fV').value;let r=R();if(q)r=r.filter(x=>(x.nombre||'').toLowerCase().includes(q)||(x.telefono||'').includes(q)||(x.servicio||'').toLowerCase().includes(q));if(e)r=r.filter(x=>x.estado===e);if(s)r=r.filter(x=>x.servicio===s);r.sort((a,b)=>b.id-a.id);const tb=document.getElementById('tB');if(!r.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">📭 Sin citas</td></tr>'}else{tb.innerHTML=r.map(x=>'<tr><td><strong>'+(x.fecha||'-')+'</strong><br><small style="color:var(--muted)">'+(x.hora||'')+'</small></td><td><a style="color:var(--primary-dark);cursor:pointer;font-weight:600" onclick="vH(\''+((x.telefono||'').replace(/'/g,"\\'"))+'\')">'+(x.nombre||'-')+'</a><br><small style="color:var(--muted)">'+(x.email||'')+'</small></td><td><a href="tel:'+((x.telefono||'').replace(/\s/g,''))+'" style="color:var(--primary)">'+(x.telefono||'-')+'</a></td><td>'+(x.servicio||'-')+'<br><small style="color:var(--muted)">'+(x.primeraVisita==='Sí'?'🆕 Nuevo':'Recurrente')+'</small></td><td><span class="bg bg-'+(x.estado==='pendiente'?'p':x.estado==='confirmada'?'c':'x')+'">'+x.estado.toUpperCase()+'</span></td><td><div class="ac"><button class="ba ba-o" onclick="cS('+x.id+',\'confirmada\')">✓</button><button class="ba ba-x" onclick="cS('+x.id+',\'cancelada\')">✕</button><button class="ba ba-e" onclick="eC2('+x.id+')">✏️</button><button class="ba ba-w" onclick="sW('+x.id+')">💬</button><button class="ba ba-d" onclick="dC('+x.id+')">🗑</button></div></td></tr>').join('')}uS();lSF()}
+
+function cS(id,e){const r=R(),i=r.find(x=>x.id===id);if(i){i.estado=e;SR(r);rT();rC2();toast('Estado actualizado')}}
+function dC(id){if(!confirm('¿Eliminar?'))return;SR(R().filter(x=>x.id!==id));rT();rC2();toast('Eliminada')}
+function sW(id){const c=C(),r=R().find(x=>x.id===id);if(!r)return;const m=c.msg.replace(/{nombre}/g,r.nombre).replace(/{clinica}/g,c.nombre).replace(/{fecha}/g,r.fecha||'(pendiente)').replace(/{hora}/g,r.hora||'(pendiente)').replace(/{servicio}/g,r.servicio);window.open('https://wa.me/'+(r.telefono||'').replace(/\D/g,'')+'?text='+encodeURIComponent(m),'_blank')}
+function oN(){document.getElementById('oCiT').textContent='➕ Nueva cita';document.getElementById('eId').value='';document.getElementById('ciF').reset();document.getElementById('fM').min=new Date().toISOString().split('T')[0];document.getElementById('fM').value=new Date().toISOString().split('T')[0];document.getElementById('oCi').classList.add('active')}
+function eC2(id){const r=R().find(x=>x.id===id);if(!r)return;document.getElementById('oCiT').textContent='✏️ Editar';document.getElementById('eId').value=id;const f=document.getElementById('ciF');f.nombre.value=r.nombre||'';f.telefono.value=r.telefono||'';f.email.value=r.email||'';f.servicio.value=r.servicio||'';f.estado.value=r.estado||'pendiente';f.fecha.value=r.fecha||'';f.hora.value=r.hora||'';f.primeraVisita.value=r.primeraVisita||'Sí';f.comentarios.value=r.comentarios||'';document.getElementById('oCi').classList.add('active')}
+function sCi(){const f=document.getElementById('ciF');if(!f.checkValidity()){f.reportValidity();return}const d=Object.fromEntries(new FormData(f)),eid=document.getElementById('eId').value;const r=R();if(eid){const i=r.findIndex(x=>x.id==eid);if(i>=0){r[i]={...r[i],...d};toast('✅ Actualizada')}}else{d.id=Date.now();d.creada=new Date().toISOString();d.origen='admin';r.push(d);toast('✅ Guardada')}SR(r);cO('oCi');rT();rC2()}
+
+function vH(tel){const r=R().filter(x=>(x.telefono||'').replace(/\s/g,'')===tel.replace(/\s/g,''));if(!r.length)return;r.sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));const p=r[r.length-1],ini=(p.nombre||'??').split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();document.getElementById('hB').innerHTML='<div style="display:flex;gap:15px;align-items:center;margin-bottom:18px;padding-bottom:15px;border-bottom:2px solid var(--border)"><div style="width:55px;height:55px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700">'+ini+'</div><div><h3 style="color:var(--primary-dark)">'+p.nombre+'</h3><p style="color:var(--muted)">📞 <a href="tel:'+tel+'" style="color:var(--primary)">'+tel+'</a></p></div></div>'+r.map(x=>'<div style="background:#f8fafc;padding:10px;border-radius:10px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;border-left:4px solid '+(x.estado==='confirmada'?'var(--success)':x.estado==='cancelada'?'var(--danger)':'var(--warning)')+'"><div><strong style="color:var(--primary-dark)">'+(x.fecha||'-')+'</strong> <small style="color:var(--muted)">'+(x.hora||'')+'</small><br>🦷 '+(x.servicio||'-')+'</div><span class="bg bg-'+(x.estado==='pendiente'?'p':x.estado==='confirmada'?'c':'x')+'">'+x.estado.toUpperCase()+'</span></div>').join('');document.getElementById('oH').classList.add('active')}
+
+function gT(v,b){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.vt').forEach(x=>x.classList.remove('active'));document.getElementById(v==='t'?'vT':'vC').classList.add('active');if(v==='c')rC2()}
+let cM=new Date().getMonth(),cY=new Date().getFullYear();
+function cM2(d){cM+=d;if(cM>11){cM=0;cY++}if(cM<0){cM=11;cY--}rC2()}
+function gTdy(){const n=new Date();cM=n.getMonth();cY=n.getFullYear();rC2()}
+function rC2(){const ms=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];document.getElementById('cT').textContent=ms[cM]+' '+cY;const f=new Date(cY,cM,1),l=new Date(cY,cM+1,0);let ps=f.getDay();ps=ps===0?6:ps-1;const r=R(),cpd={};r.forEach(x=>{if(x.fecha){if(!cpd[x.fecha])cpd[x.fecha]=[];cpd[x.fecha].push(x)}});const td=new Date().toISOString().split('T')[0],tc=Math.ceil((ps+l.getDate())/7)*7;let h='';const pm=new Date(cY,cM,0).getDate();for(let i=ps-1;i>=0;i--)h+='<div class="cy om"><div class="dn">'+(pm-i)+'</div></div>';for(let d=1;d<=l.getDate();d++){const fs=cY+'-'+String(cM+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'),is=fs===td,ci=cpd[fs]||[];let ev='';ci.slice(0,3).forEach(c=>{ev+='<div class="cv '+(c.estado==='pendiente'?'p':c.estado==='confirmada'?'c':'x')+'" onclick="event.stopPropagation();vD(\''+fs+'\')" title="'+c.hora+' '+c.nombre+'">'+(c.hora||'')+' '+c.nombre.split(' ')[0]+'</div>'});if(ci.length>3)ev+='<div style="font-size:.65rem;color:var(--primary);font-weight:600;margin-top:2px">+'+(ci.length-3)+'</div>';h+='<div class="cy'+(is?' td':'')+'" onclick="vD(\''+fs+'\')"><div class="dn">'+d+'</div>'+ev+'</div>'}const rem=tc-(ps+l.getDate());for(let d=1;d<=rem;d++)h+='<div class="cy om"><div class="dn">'+d+'</div></div>';document.getElementById('cB').innerHTML=h}
+function vD(f){const r=R().filter(x=>x.fecha===f).sort((a,b)=>(a.hora||'').localeCompare(b.hora||''));const fo=new Date(f+'T00:00:00').toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});let h='<div style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;padding:18px;border-radius:14px;margin:-25px -25px 15px"><h3 style="font-size:1.2rem">'+fo+'</h3><p style="opacity:.9">'+r.length+' cita(s)</p></div>';if(!r.length)h+='<div style="text-align:center;padding:40px;color:var(--muted)">📭 Sin citas</div>';else r.forEach(c=>{h+='<div style="background:#f8fafc;padding:10px;border-radius:10px;margin-bottom:6px;border-left:4px solid '+(c.estado==='confirmada'?'var(--success)':c.estado==='cancelada'?'var(--danger)':'var(--warning)')+'"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><strong style="color:var(--primary-dark)">🕐 '+(c.hora||'-')+'</strong><span class="bg bg-'+(c.estado==='pendiente'?'p':c.estado==='confirmada'?'c':'x')+'">'+c.estado.toUpperCase()+'</span></div><strong>'+c.nombre+'</strong><br><small style="color:var(--muted)">🦷 '+c.servicio+' · 📞 '+c.telefono+'</small><div style="margin-top:6px;display:flex;gap:4px"><button class="ba ba-e" onclick="eC2('+c.id+');cO(\'oD\')">✏️</button><button class="ba ba-w" onclick="sW('+c.id+')">💬</button></div></div>'});document.getElementById('dB').innerHTML=h;document.getElementById('oD').classList.add('active')}
+
+function oC(){const c=C();document.getElementById('cN').value=c.nombre;document.getElementById('cE').value=c.eslogan;document.getElementById('cT2').value=c.telefono;document.getElementById('cTV').value=c.telVis;document.getElementById('cEm').value=c.email;document.getElementById('cDi').value=c.dir;document.getElementById('cH1').value=c.h1;document.getElementById('cH2').value=c.h2;document.getElementById('cP').value=c.pass;document.getElementById('cM').value=c.msg;document.getElementById('cCur').innerHTML='<div class="cr"><span>Nombre:</span><strong>'+c.nombre+'</strong></div><div class="cr"><span>Teléfono:</span><strong>'+c.telVis+'</strong></div><div class="cr"><span>Dirección:</span><strong>'+c.dir+'</strong></div>';document.getElementById('oC2').classList.add('active')}
+function sC(){const n={nombre:document.getElementById('cN').value.trim(),eslogan:document.getElementById('cE').value.trim(),telefono:document.getElementById('cT2').value.trim().replace(/[\s\+\-]/g,''),telVis:document.getElementById('cTV').value.trim(),email:document.getElementById('cEm').value.trim(),dir:document.getElementById('cDi').value.trim(),h1:document.getElementById('cH1').value.trim(),h2:document.getElementById('cH2').value.trim(),pass:document.getElementById('cP').value.trim()||'admin123',msg:document.getElementById('cM').value.trim()};if(!n.telefono||n.telefono.length<9){alert('⚠️ Teléfono inválido (mínimo 9 dígitos con código de país)');return}if(C().pass!==n.pass)sessionStorage.removeItem('auth');SC(n);AC();cO('oC2');toast('✅ Configuración guardada');if(document.getElementById('vG').classList.contains('active'))setTimeout(gQ,100)}
+function rC(){if(!confirm('¿Restaurar valores por defecto?'))return;SC({...DEF});AC();cO('oC2');toast('🔄 Restaurado')}
+
+let nOn=false,lId=0,lQR=0;
+function tN(){nOn=!nOn;document.getElementById('bN').classList.toggle('on',nOn);if(nOn){toast('🔔 Activadas','inf');lId=mId()}else toast('🔕 Desactivadas','inf')}
+function bp(){try{const x=new(window.AudioContext||window.webkitAudioContext)(),o=x.createOscillator(),g=x.createGain();o.connect(g);g.connect(x.destination);o.frequency.value=880;g.gain.setValueAtTime(.3,x.currentTime);g.gain.exponentialRampToValueAtTime(.01,x.currentTime+.4);o.start();o.stop(x.currentTime+.4)}catch(e){}}
+function bU(){try{const x=new(window.AudioContext||window.webkitAudioContext)();[880,1100,880].forEach((f,i)=>{setTimeout(()=>{const o=x.createOscillator(),g=x.createGain();o.connect(g);g.connect(x.destination);o.type='square';o.frequency.value=f;g.gain.setValueAtTime(.3,x.currentTime);g.gain.exponentialRampToValueAtTime(.01,x.currentTime+.15);o.start();o.stop(x.currentTime+.15)},i*200)})}catch(e){}}
+function sP2(){setInterval(()=>{if(!nOn)return;const m=mId();if(m>lId){const n=R().filter(x=>x.id>lId);lId=m;bp();document.getElementById('ncnT').textContent='🔔 Nueva cita';document.getElementById('ncnP').textContent=n.length===1?n[0].nombre+' · '+n[0].servicio:n.length+' nuevas';document.getElementById('ncn').classList.add('show');setTimeout(()=>document.getElementById('ncn').classList.remove('show'),8000);rT();rC2();document.getElementById('bN').classList.add('h')}},3000)}
+function sQ2(){setInterval(()=>{const q=localStorage.getItem('nqr');if(!q)return;const d=JSON.parse(q);if(d.id===lQR)return;lQR=d.id;localStorage.removeItem('nqr');bU();const n=document.createElement('div');n.className='ncn show';n.style.borderLeftColor='#ef4444';n.innerHTML='<h4 style="color:#ef4444">🚨 ¡Solicitud QR!</h4><p><strong>'+d.nombre+'</strong><br>📞 '+d.telefono+'</p><p style="font-size:.8rem;color:var(--muted)"><strong>¡LLAMAR AHORA!</strong></p><div style="display:flex;gap:5px"><button onclick="window.open(\'tel:'+d.telefono+'\',\'_self\')" style="flex:1;background:#ef4444;color:white;border:none;padding:7px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.8rem">📞 LLAMAR</button><button onclick="this.parentElement.parentElement.remove()" style="background:#e2e8f0;border:none;padding:7px;border-radius:8px;cursor:pointer;font-size:.8rem">✕</button></div>';document.body.appendChild(n);setTimeout(()=>{if(n.parentNode)n.remove()},15000);if(document.getElementById('pA').classList.contains('active')){rT();rC2()}document.getElementById('bN').classList.add('h')},1000)}
+
+function eC(){const r=R();if(!r.length){alert('Sin datos');return}const h=['ID','Fecha','Hora','Nombre','Tel','Email','Servicio','1ªVisita','Estado','Comentarios','Creada'],rows=r.map(x=>[x.id,x.fecha,x.hora,x.nombre,x.telefono,x.email||'',x.servicio,x.primeraVisita,x.estado,(x.comentarios||'').replace(/"/g,'""'),x.creada]),csv=[h,...rows].map(r=>r.map(c=>'"'+c+'"').join(';')).join('\n'),b=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='citas_'+new Date().toISOString().split('T')[0]+'.csv';a.click();URL.revokeObjectURL(u);toast('📥 CSV exportado')}
+function lD(){if(!confirm('¿Cargar 10 citas demo?'))return;const n=new Date(),sd=d=>{const x=new Date(n);x.setDate(x.getDate()+d);return x.toISOString().split('T')[0]};const dd=[{nombre:"María López",telefono:"612345678",email:"maria@email.com",servicio:"Ortodoncia invisible",fecha:sd(2),hora:"10:00",primeraVisita:"No",comentarios:"Revisión",estado:"pendiente"},{nombre:"Javier Rodríguez",telefono:"623456789",email:"javier@email.com",servicio:"Implantes dentales",fecha:sd(3),hora:"11:30",primeraVisita:"Sí",comentarios:"Falta muela",estado:"confirmada"},{nombre:"Ana Martínez",telefono:"634567890",email:"ana@email.com",servicio:"Blanqueamiento",fecha:sd(5),hora:"17:00",primeraVisita:"Sí",estado:"pendiente"},{nombre:"Carlos Fernández",telefono:"645678901",email:"carlos@email.com",servicio:"Limpieza dental",fecha:sd(1),hora:"09:30",primeraVisita:"No",estado:"confirmada"},{nombre:"Laura Gómez",telefono:"656789012",email:"laura@email.com",servicio:"Estética dental",fecha:sd(7),hora:"16:00",primeraVisita:"Sí",comentarios:"Carillas",estado:"pendiente"},{nombre:"Pedro Jiménez",telefono:"667890123",email:"pedro@email.com",servicio:"Endodoncia",fecha:sd(-2),hora:"12:00",primeraVisita:"No",estado:"cancelada"},{nombre:"Isabel Torres",telefono:"678901234",email:"isabel@email.com",servicio:"Odontopediatría",fecha:sd(4),hora:"18:00",primeraVisita:"Sí",comentarios:"Niño 7 años",estado:"confirmada"},{nombre:"Miguel Álvarez",telefono:"689012345",email:"miguel@email.com",servicio:"Primera visita gratuita",fecha:sd(6),hora:"10:30",primeraVisita:"Sí",estado:"pendiente"},{nombre:"Carmen Díaz",telefono:"690123456",email:"carmen@email.com",servicio:"Implantes dentales",fecha:sd(8),hora:"11:00",primeraVisita:"Sí",comentarios:"2 implantes",estado:"pendiente"},{nombre:"María López",telefono:"612345678",email:"maria@email.com",servicio:"Limpieza dental",fecha:sd(-15),hora:"10:00",primeraVisita:"No",estado:"confirmada"}];const r=R();dd.forEach(d=>{d.id=Date.now()+Math.random()*1000;d.creada=new Date().toISOString();d.origen='demo';r.push(d)});SR(r);rT();rC2();toast('✅ 10 citas demo')}
+function dA(){if(!confirm('⚠️ ¿Borrar TODO?'))return;if(!confirm('¿100% seguro?'))return;localStorage.removeItem('cit');rT();rC2();toast('🗑 Todo eliminado')}
+
+document.querySelectorAll('.ov').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('active')}));
+function cO(id){document.getElementById(id).classList.remove('active')}
+function toast(m,t=''){const e=document.getElementById('toast');e.textContent=m;e.className='toast show'+(t?' '+t:'');setTimeout(()=>e.classList.remove('show'),3000)}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+</body>
+</html>
