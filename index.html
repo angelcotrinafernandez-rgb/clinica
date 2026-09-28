@@ -218,7 +218,6 @@ td{padding:12px;border-top:1px solid var(--border);font-size:.9rem}
 .ncn p{font-size:.82rem;margin-bottom:8px}
 .ncn button{background:var(--primary);color:white;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:600;font-size:.8rem}
 
-/* ================= NOTIFICACIÓN GRANDE PARA LA CLÍNICA ================= */
 .big-notif{position:fixed;inset:0;background:rgba(15,23,42,.94);z-index:7000;display:none;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
 .big-notif.active{display:flex;animation:bnIn .3s ease}
 @keyframes bnIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
@@ -259,7 +258,6 @@ td{padding:12px;border-top:1px solid var(--border);font-size:.9rem}
   <button data-v="qrgen" onclick="go('qrgen',this)">🎨 QR</button>
 </nav>
 
-<!-- ==================== LANDING ==================== -->
 <div class="view active" id="vL">
   <section class="hero">
     <h1>Tu sonrisa merece la mejor atención</h1>
@@ -295,7 +293,6 @@ td{padding:12px;border-top:1px solid var(--border);font-size:.9rem}
   </footer>
 </div>
 
-<!-- ==================== PEDIR CITA (QR) ==================== -->
 <div class="view" id="vQ">
   <div class="qv">
     <div class="qb">
@@ -325,7 +322,6 @@ td{padding:12px;border-top:1px solid var(--border);font-size:.9rem}
   </div>
 </div>
 
-<!-- ==================== ADMIN ==================== -->
 <div class="view" id="vA">
   <div class="lw" id="lS">
     <div class="lb">
@@ -377,7 +373,6 @@ td{padding:12px;border-top:1px solid var(--border);font-size:.9rem}
   </div>
 </div>
 
-<!-- ==================== GENERADOR QR ==================== -->
 <div class="view" id="vG">
   <div class="qw">
     <h2>🎨 Generador de QR</h2>
@@ -417,7 +412,6 @@ td{padding:12px;border-top:1px solid var(--border);font-size:.9rem}
   </div>
 </div>
 
-<!-- ==================== MODALES ==================== -->
 <div class="ov" id="oC2"><div class="ob"><div class="oh"><h3>⚙️ Configuración</h3><button class="oc" onclick="cO('oC2')">×</button></div><div class="om">
   <div class="ch2"><strong>ℹ️</strong> Estos datos se aplican en <strong>toda la app</strong>. Se guardan en tu navegador.</div>
   <div class="cc2"><h4>✅ Actual</h4><div id="cCur"></div></div>
@@ -435,7 +429,6 @@ td{padding:12px;border-top:1px solid var(--border);font-size:.9rem}
 <div class="ov" id="oH"><div class="ob"><div class="oh"><h3>📋 Historial</h3><button class="oc" onclick="cO('oH')">×</button></div><div class="om" id="hB"></div></div></div>
 <div class="ov" id="oD"><div class="ob sm"><div class="oh"><h3>📅 Citas del día</h3><button class="oc" onclick="cO('oD')">×</button></div><div class="om" id="dB"></div></div></div>
 
-<!-- ==================== NOTIFICACIÓN GRANDE ==================== -->
 <div class="big-notif" id="bigNotif">
   <div class="big-card">
     <div class="big-pulse">🔔</div>
@@ -459,11 +452,11 @@ td{padding:12px;border-top:1px solid var(--border);font-size:.9rem}
 <div class="ncn" id="ncn"><h4 id="ncnT">🔔 Nueva cita</h4><p id="ncnP"></p><button onclick="this.parentElement.classList.remove('show')">Cerrar</button></div>
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<!-- ✅ QRCode.js (versión navegador, funciona en GitHub Pages) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 /* =================================================================
    CONFIGURACIÓN INICIAL
-   Cambia aquí el número de WhatsApp antes de subir a GitHub
    ================================================================= */
 const DEF={
   nombre:'Clínica Dental',
@@ -523,7 +516,7 @@ function go(v,btn){
   if(location.hash!=='#'+v)history.replaceState(null,'','#'+v);
   window.scrollTo(0,0);
   if(v==='qrgen')setTimeout(gQ,150);
-  if(v==='qr')setTimeout(()=>{ document.getElementById('qFecha').min=hoyLocal(); sugerirPrimerHueco(); },150);
+  if(v==='qr')setTimeout(()=>{document.getElementById('qFecha').min=hoyLocal();sugerirPrimerHueco();},150);
 }
 window.addEventListener('hashchange',()=>{
   const v=location.hash.replace('#','')||'landing';
@@ -625,7 +618,6 @@ function sReservar(){
     alert('Rellena todos los campos obligatorios');
     return;
   }
-  // Verificación anti-conflicto (por si el hueco se ocupó entre medias)
   if(hayConflicto(d.fecha,d.hora)){
     alert('⚠️ Ese hueco acaba de ocuparse. Elige otro por favor.');
     actualizarHorasQR();
@@ -647,12 +639,9 @@ function sReservar(){
     creada:new Date().toISOString()
   };
   const r=R();r.push(n);SR(r);
-  // Disparar notificación grande para la clínica (mismo navegador)
   localStorage.setItem('bigNotif',JSON.stringify({id:n.id,t:Date.now()}));
-  // WhatsApp automático (funciona cross-device)
   const m=`¡Hola! 👋 Soy *${n.nombre}*, acabo de reservar cita en ${c.nombre}.\n\n🦷 ${n.servicio}\n📅 ${formatoFecha(n.fecha)} a las ${n.hora}\n📞 ${n.telefono}\n${n.comentarios?'💬 '+n.comentarios+'\n':''}\n*Confírmame por favor.*`;
   window.open('https://wa.me/'+c.telefono+'?text='+encodeURIComponent(m),'_blank','noopener');
-  // Mostrar pantalla de éxito
   document.getElementById('qOkDetalle').innerHTML=
     '<div style="margin-bottom:6px">👤 <strong>'+esc(n.nombre)+'</strong></div>'+
     '<div style="margin-bottom:6px">🦷 '+esc(n.servicio)+'</div>'+
@@ -670,7 +659,11 @@ function resetQ(){
   sugerirPrimerHueco();
 }
 
-/* ============================= GENERADOR QR ============================= */
+/* =================================================================
+   GENERADOR QR  ← AQUÍ ESTÁ EL CAMBIO PRINCIPAL
+   Usa qrcodejs (davidshimjs), la librería de QR para navegador.
+   Crea un <canvas> interno y extraemos el data URL con toDataURL().
+   ================================================================= */
 function getBaseUrl(){
   let u=location.origin+location.pathname;
   u=u.replace(/index\.html?$/i,'').replace(/\/[^\/]*\.html?$/i,'/');
@@ -682,13 +675,46 @@ function gQ(){
   const v=document.getElementById('gV').value||'1';
   const url=u.split('#')[0]+(u.includes('?')?'&':'?')+'v='+v+'#qr';
   document.getElementById('gP').textContent=url;
-  if(typeof QRCode==='undefined'){toast('⏳ Cargando generador QR...','inf');setTimeout(gQ,500);return}
-  QRCode.toDataURL(url,{width:500,margin:1,color:{dark:'#0369a1',light:'#ffffff'},errorCorrectionLevel:'M'})
-    .then(d=>document.querySelectorAll('.qI').forEach(i=>{i.src=d;i.dataset.ready='1'}))
-    .catch(()=>toast('❌ Error generando QR','err'));
+
+  if(typeof QRCode==='undefined'){
+    toast('⏳ Cargando generador QR...','inf');
+    setTimeout(gQ,400);
+    return;
+  }
+
+  // Contenedor temporal fuera de pantalla (qrcodejs necesita un elemento real)
+  const tmp=document.createElement('div');
+  tmp.style.cssText='position:absolute;left:-9999px;top:-9999px;width:500px;height:500px;';
+  document.body.appendChild(tmp);
+
+  try{
+    new QRCode(tmp,{
+      text: url,
+      width: 500,
+      height: 500,
+      colorDark: '#0369a1',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }catch(err){
+    console.error('Error QR:',err);
+    toast('❌ Error generando QR','err');
+    tmp.remove();
+    return;
+  }
+
+  // Extraer el data URL del canvas
+  const canvas=tmp.querySelector('canvas');
+  if(canvas){
+    const dataUrl=canvas.toDataURL('image/png');
+    document.querySelectorAll('.qI').forEach(i=>{i.src=dataUrl;i.dataset.ready='1'});
+  }
+  tmp.remove();
+
   AC();
   toast('✅ QR regenerado (v'+v+')');
 }
+
 function pT(id){
   const el=document.getElementById(id),w=window.open('','_blank');
   const s=Array.from(document.querySelectorAll('style')).map(x=>x.outerHTML).join('');
@@ -940,7 +966,6 @@ function tN(){
   if(nOn)lId=mId();
 }
 
-/* Sonido llamativo */
 function bAlarm(){
   try{
     const x=new(window.AudioContext||window.webkitAudioContext)();
@@ -959,7 +984,6 @@ function bAlarm(){
 }
 function bp(){try{const x=new(window.AudioContext||window.webkitAudioContext)(),o=x.createOscillator(),g=x.createGain();o.connect(g);g.connect(x.destination);o.frequency.value=880;g.gain.setValueAtTime(.3,x.currentTime);g.gain.exponentialRampToValueAtTime(.01,x.currentTime+.4);o.start();o.stop(x.currentTime+.4)}catch(e){}}
 
-/* Intervalo: nuevas citas normales */
 function sP2(){
   setInterval(()=>{
     if(!nOn)return;
@@ -977,7 +1001,6 @@ function sP2(){
   },3000);
 }
 
-/* Intervalo: pre-agendadas → notificación GRANDE */
 function sQ2(){
   setInterval(()=>{
     const raw=localStorage.getItem('bigNotif');
@@ -1009,12 +1032,10 @@ function mostrarBigNotif(c){
   document.getElementById('bnServicio').textContent='🦷 '+(c.servicio||'');
   document.getElementById('bnFecha').textContent='📅 '+formatoFechaLarga(c.fecha)+' · '+(c.hora||'');
   document.getElementById('bigNotif').classList.add('active');
-  // Sonido repetido durante ~12s
   if(bigSoundIv)clearInterval(bigSoundIv);
   bAlarm();
   let n=1;
   bigSoundIv=setInterval(()=>{if(++n>=6){clearInterval(bigSoundIv);bigSoundIv=null;return}bAlarm()},2200);
-  // Refrescar UI de fondo
   rT();renderCal();
   document.getElementById('bN').classList.add('h');
 }
@@ -1027,4 +1048,72 @@ function cerrarBigNotif(){
 
 function bigConfirmar(){
   if(!bigCitaActual)return;
-  const r=R();const i=r.find
+  const r=R();const i=r.findIndex(x=>x.id===bigCitaActual.id);
+  if(i>=0){r[i].estado='confirmada';SR(r);toast('✅ Cita confirmada')}
+  rT();renderCal();cerrarBigNotif();
+}
+
+function bigRechazar(){
+  if(!bigCitaActual)return;
+  if(!confirm('¿Rechazar esta solicitud? El hueco quedará libre.'))return;
+  const r=R();const i=r.findIndex(x=>x.id===bigCitaActual.id);
+  if(i>=0){r[i].estado='cancelada';SR(r);toast('❌ Rechazada')}
+  rT();renderCal();cerrarBigNotif();
+}
+
+function bigLlamar(){
+  if(!bigCitaActual)return;
+  window.location.href='tel:'+bigCitaActual.telefono;
+}
+
+/* ============================= CSV / DEMO ============================= */
+function eC(){
+  const r=R();if(!r.length){alert('Sin datos');return}
+  const h=['ID','Fecha','Hora','Nombre','Tel','Email','Servicio','1ªVisita','Estado','Origen','Comentarios','Creada'];
+  const rows=r.map(x=>[x.id,x.fecha,x.hora,x.nombre,x.telefono,x.email||'',x.servicio,x.primeraVisita,x.estado,x.origen||'',(x.comentarios||'').replace(/"/g,'""'),x.creada]);
+  const csv=[h,...rows].map(r=>r.map(c=>'"'+(c==null?'':String(c))+'"').join(';')).join('\n');
+  const b=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const u=URL.createObjectURL(b),a=document.createElement('a');
+  a.href=u;a.download='citas_'+hoyLocal()+'.csv';a.click();URL.revokeObjectURL(u);
+  toast('📥 CSV exportado');
+}
+function lD(){
+  if(!confirm('¿Cargar 10 citas demo? Se eliminarán las demo anteriores.'))return;
+  let r=R().filter(x=>x.origen!=='demo');
+  const n=new Date(),sd=d=>{const x=new Date(n);x.setDate(x.getDate()+d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')};
+  const dd=[
+    {nombre:"María López",telefono:"612345678",email:"maria@email.com",servicio:"Ortodoncia invisible",fecha:sd(2),hora:"10:00",primeraVisita:"No",comentarios:"Revisión",estado:"pendiente"},
+    {nombre:"Javier Rodríguez",telefono:"623456789",email:"javier@email.com",servicio:"Implantes dentales",fecha:sd(3),hora:"11:30",primeraVisita:"Sí",comentarios:"Falta muela",estado:"confirmada"},
+    {nombre:"Ana Martínez",telefono:"634567890",email:"ana@email.com",servicio:"Blanqueamiento",fecha:sd(5),hora:"17:00",primeraVisita:"Sí",estado:"pendiente"},
+    {nombre:"Carlos Fernández",telefono:"645678901",email:"carlos@email.com",servicio:"Limpieza dental",fecha:sd(1),hora:"09:30",primeraVisita:"No",estado:"confirmada"},
+    {nombre:"Laura Gómez",telefono:"656789012",email:"laura@email.com",servicio:"Estética dental",fecha:sd(7),hora:"16:00",primeraVisita:"Sí",comentarios:"Carillas",estado:"pre-agendada"},
+    {nombre:"Pedro Jiménez",telefono:"667890123",email:"pedro@email.com",servicio:"Endodoncia",fecha:sd(-2),hora:"12:00",primeraVisita:"No",estado:"cancelada"},
+    {nombre:"Isabel Torres",telefono:"678901234",email:"isabel@email.com",servicio:"Odontopediatría",fecha:sd(4),hora:"18:00",primeraVisita:"Sí",comentarios:"Niño 7 años",estado:"confirmada"},
+    {nombre:"Miguel Álvarez",telefono:"689012345",email:"miguel@email.com",servicio:"Primera visita gratuita",fecha:sd(6),hora:"10:30",primeraVisita:"Sí",estado:"pendiente"},
+    {nombre:"Carmen Díaz",telefono:"690123456",email:"carmen@email.com",servicio:"Implantes dentales",fecha:sd(8),hora:"11:00",primeraVisita:"Sí",comentarios:"2 implantes",estado:"pre-agendada"},
+    {nombre:"María López",telefono:"612345678",email:"maria@email.com",servicio:"Limpieza dental",fecha:sd(-15),hora:"10:00",primeraVisita:"No",estado:"confirmada"}
+  ];
+  dd.forEach(d=>{d.id=Date.now()+Math.floor(Math.random()*100000);d.creada=new Date().toISOString();d.origen='demo';r.push(d)});
+  SR(r);rT();renderCal();toast('✅ 10 citas demo');
+}
+function dA(){
+  if(!confirm('⚠️ ¿Borrar TODAS las citas?'))return;
+  if(!confirm('¿100% seguro?'))return;
+  localStorage.removeItem('cit');rT();renderCal();toast('🗑 Todo eliminado');
+}
+
+/* ============================= MODAL CERRAR ============================= */
+document.querySelectorAll('.ov').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('active')}));
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    document.querySelectorAll('.ov.active').forEach(m=>m.classList.remove('active'));
+    if(document.getElementById('bigNotif').classList.contains('active'))cerrarBigNotif();
+  }
+});
+
+/* ============================= INIT ============================= */
+AC();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+</body>
+</html>
